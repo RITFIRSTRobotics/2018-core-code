@@ -1,1 +1,4 @@
-# this is an empty python file
+# this is not an empty python file
+
+def test():
+    print("testing...")
