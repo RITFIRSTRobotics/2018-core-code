@@ -13,17 +13,20 @@ class Packet:
         Defines the type of data stored in a packet
         """
 
-        COMMAND = 0
-        STATUS = 1
+        REQUEST = 0
+        RESPONSE = 1
+        STATUS = 2
 
-        __slots__ = [COMMAND, STATUS]
+
+        __slots__ = [REQUEST, RESPONSE, STATUS]
 
     __type = None
     __data = None
     __slots__ = [__type, __data]
 
-    def __init__(self, type):
+    def __init__(self, type, data):
         self.__type = type
+        self.__data = data
 
     def get_data(self):
         """
@@ -32,6 +35,9 @@ class Packet:
         :return: the data contained in the packet
         """
         return self.__data
+
+    def get_type(self):
+        return self.__type
 
     def __sizeof__(self):
         """
