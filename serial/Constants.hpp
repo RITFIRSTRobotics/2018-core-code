@@ -10,5 +10,3 @@
  * A String sent to the Arduino when Serial has been initalized
  */
 #define INIT_STRING "i0"
-
-

@@ -32,99 +32,87 @@ class HeaderParser:
         contents = file.read().strip()  # Read the header into memory
         file.close()  # Don't need the file anymore
 
-        # Parse the file the right way (using a state machine)
-        # First, we need to make a bunch of states
-        class State(Enum):
-            FS_DETECTED = 0  # Forward-slash detected
-            INBL_COMMENT = 1  # In a block comment
-            INLN_COMMENT = 2  # In a line comment
-            PP_COMMAND = 3  # Preprocessor command detected
-            IN_CODE = 4  # In code, nothing needs to be done
-            BL_AST_DETECTED = 5  # In a block comment and an asterisk was detected
-            PP_DEFINE = 6 # A #define command has been found
-            PP_DEFINE_VALUE = 7 # Getting the value from a #define command
+        # Strip away comments
+        # Start with block comments
+        while True:
+            # First, see if a block comment is here
+            start = contents.find("/*")
 
-            pass
+            # If not, skip to the next section
+            if start == -1:
+                break
+            else:
+                # If so, find the end
+                end = contents.find("*/", start)
+                if end == -1:
+                    # If the end doesn't exist, raise an error
+                    raise SyntaxError("HeaderParser: error parsing " + str(file.name) + ": hit EOF")
 
-        # Next, instantiate some variables
-        cstate = State.IN_CODE
-        name = ""
-        value = ""
+                # Patch a new string together
+                temp_string = contents[:]
+                contents = temp_string[0:start] if start != 0 else ""
+                contents += temp_string[end + 2:] if (end + 2) < len(temp_string) else ""
 
-        # Now, time to get processing
-        for char in contents:
+        while True:
+            # See if a line comment exists
+            start = contents.find("//")
 
-            ### States for detecting the start of a comment
+            # If not, go to the next section
+            if start == -1:
+                break
+            else:
+                # Find the end of the line (ie end of the comment)
+                end = contents.find("\n", start)
 
-            if char == '/' and cstate != State.FS_DETECTED:  # State for when a comment might have been detected
-                cstate = State.FS_DETECTED
-                continue
+                # Make a new string
+                temp_string = contents[:]
+                contents = temp_string[0:start] if start != 0 else ""
+                contents += temp_string[end + 1:] if end != -1 else ""
 
-            if cstate == State.FS_DETECTED and char == '*':  # State for detecting block comments
-                cstate = State.INBL_COMMENT
-                continue
+        # todo make a dict of the string so line numbers can be referenced -Connor
+        # todo find \ characters and remove them
 
-            if cstate == State.FS_DETECTED and char == '/':  # State for detecting line comments
-                cstate = State.INLN_COMMENT
-                continue
+        # Clean up the string a little
+        contents = contents.lstrip()
 
-            if cstate == State.FS_DETECTED:  # Revert the state if a comment was not detected
-                cstate = State.IN_CODE
-                continue
+        process_ln = []
+        depth = -1
+        # Parse each line
+        for line in contents.split("\n"):
 
-            ### States for detecting the end of a comment
 
-            if cstate == State.INBL_COMMENT and char == '*':  # State for escaping block comments
-                cstate = State.BL_AST_DETECTED
-                continue
+            # ifdef stuffs
+            if line.lstrip().startswith("#endif"):
+                process_ln.pop(depth)
+                depth -= 1
 
-            if cstate == State.BL_AST_DETECTED and char == '/':  # State for escaping block comments
-                cstate = State.IN_CODE
-                continue
+            if line.lstrip().startswith("#else"):
+                process_ln[depth] = not process_ln[depth]
 
-            if cstate == State.BL_AST_DETECTED:  # State for when a block comment was not completed
-                cstate = State.INBL_COMMENT
-                continue
 
-            if cstate == State.INLN_COMMENT and char == '\n':  # State for escaping line comments
-                cstate = State.BL_AST_DETECTED
-                continue
+            if depth != -1:
+                if not (process_ln[depth] == None or process_ln[depth] == True):
+                    continue
 
-            ### States for detecing preprocessor commands
+            # See if the line starts with #define
+            if line.lstrip().startswith("#define"):
+                # Break the line into parts
+                parts = line.lstrip().split(" ")
 
-            if cstate == State.IN_CODE and char == '#': # State for detecting the beginning of a preprocessor command
-                cstate = State.PP_COMMAND
-                continue
+                # Get rid of empty parts (ie more than one space between things)
+                temp_parts = parts[:] # Copy the list
+                parts = [] # Make the list empty
+                for part in temp_parts: # Go through the list and add things that are valid
+                    if part.strip() != "":
+                        parts.append(part)
 
-            if cstate == State.PP_COMMAND and char != ' ': # State for figuring out the name of the command
-                name += char
-                continue
+                # Make sure there is a valid number of parts
+                if len(parts) < 3:
+                    raise SyntaxError("HeaderParser: error parsing line `" + str(line) + "`")
 
-            if cstate == State.PP_COMMAND and char == ' ': # State for figuring out the name of the command
-                if name.strip() == "define":
-                    cstate = State.PP_DEFINE
-                else:
-                    cstate = State.IN_CODE
-                name = ""
-                continue
-
-            ### States for the #define command
-
-            if cstate == State.PP_DEFINE and char != ' ': # State for getting the name of the #define
-                name += char
-                continue
-
-            if cstate == State.PP_DEFINE and char == ' ': # State for getting the value of the #define
-                cstate = State.PP_DEFINE_VALUE
-                continue
-
-            if cstate == State.PP_DEFINE_VALUE and (char != ' ' and char != '\n'): # State for getting the value of the #define
-                value += char
-                continue
-
-            if cstate == State.PP_DEFINE_VALUE and (char == ' ' or char == '\n'): # State for processing the value of the #define
-                cstate = State.IN_CODE
-
+                # Figure out the type of the data
+                name = parts[1]
+                value = parts[2]
                 if value.startswith("\"") and value.endswith("\""):
                     # value is a string
                     self.contents[name] = str(value[1:-1])
@@ -142,8 +130,30 @@ class HeaderParser:
                     self.contents[name] = str(value[1:-1])
                 else:
                     raise SyntaxWarning("HeaderParser: can not detect type of \'" + value + "\'")
+                continue
 
-                name = ""
-                value = ""
+            # See if the line starts with an #ifdef
+            if line.lstrip().startswith("#ifdef"):
+
+                parts = line.lstrip().split(" ")
+                # Get rid of empty parts (ie more than one space between things)
+                temp_parts = parts[:]  # Copy the list
+                parts = []  # Make the list empty
+                for part in temp_parts:  # Go through the list and add things that are valid
+                    if part.strip() != "":
+                        parts.append(part)
+
+                if len(parts) != 2:
+                    raise SyntaxError("HeaderParser: error parsing line `" + str(line) + "`")
+
+                if str(parts[1]) in self.contents:
+                    process_ln.append(True)
+                else:
+                    process_ln.append(False)
+                continue
+
+
+        if depth != -1:
+            raise SyntaxError("HeaderParser: reached EOF and depth is non-zero")
 
         pass
