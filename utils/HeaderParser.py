@@ -1,23 +1,26 @@
-from enum import Enum
-
+import os
 import sys
 
 
 class HeaderParser:
     """
     Parses .h and .hpp files for #defines and makes a dict of the contents
+
+    :author: Connor Henley @thatging3rkid
     """
 
-    contents = None
+    __slots__ = ["contents"]  # save a little memory
 
     def __init__(self, path):
         # Make sure path is a string
         if type(path) is not str:
             raise TypeError("HeaderParser: not given a string")
 
+        # Make sure this is a header file
         if path.find(".h") is -1:
             print("HeaderParser: not a header file", file=sys.stderr)
 
+        # Initialize the contents dict
         self.contents = dict()
 
         # Open the file
@@ -48,10 +51,12 @@ class HeaderParser:
                     # If the end doesn't exist, raise an error
                     raise SyntaxError("HeaderParser: error parsing " + str(file.name) + ": hit EOF")
 
-                # Patch a new string together
-                temp_string = contents[:]
-                contents = temp_string[0:start] if start != 0 else ""
-                contents += temp_string[end + 2:] if (end + 2) < len(temp_string) else ""
+                # Patch a new string together (keeping the number of newlines)
+                temp_string = contents[:] # make a copy to take from
+                num_newlines = contents.count("\n", start, end) # count the number of newlines
+                contents = temp_string[0:start] if start != 0 else "" # add the pre-comment
+                contents += "\n" * num_newlines # add the number of newlines
+                contents += temp_string[end + 2:] if (end + 2) < len(temp_string) else "" # add the post-comment
 
         while True:
             # See if a line comment exists
@@ -65,33 +70,31 @@ class HeaderParser:
                 end = contents.find("\n", start)
 
                 # Make a new string
-                temp_string = contents[:]
-                contents = temp_string[0:start] if start != 0 else ""
-                contents += temp_string[end + 1:] if end != -1 else ""
+                temp_string = contents[:] # make a copy to take from
+                contents = temp_string[0:start] if start != 0 else "" # add the pre-comment
+                contents += temp_string[end:] if end != -1 else "" # add the post-comment (keep the newline)
 
-        # todo make a dict of the string so line numbers can be referenced -Connor
-        # todo find \ characters and remove them
-
-        # Clean up the string a little
-        contents = contents.lstrip()
-
-        process_ln = []
-        depth = -1
+        process_ln = [] # keep track if code should be executed
+        depth = -1 # keep track of the depth of the if statement
         # Parse each line
-        for line in contents.split("\n"):
+        lines = contents.split("\n")
+        for i in range(0, len(lines)):
+            line = lines[i]
 
-
-            # ifdef stuffs
+            # Check for an #endif
             if line.lstrip().startswith("#endif"):
                 process_ln.pop(depth)
                 depth -= 1
+                continue
 
+            # Check for an #else
             if line.lstrip().startswith("#else"):
                 process_ln[depth] = not process_ln[depth]
+                continue
 
-
+            # Skip the line if it should not be processed (ie #ifdef is false)
             if depth != -1:
-                if not (process_ln[depth] == None or process_ln[depth] == True):
+                if not process_ln[depth] is None or process_ln[depth] is True:
                     continue
 
             # See if the line starts with #define
@@ -100,15 +103,20 @@ class HeaderParser:
                 parts = line.lstrip().split(" ")
 
                 # Get rid of empty parts (ie more than one space between things)
-                temp_parts = parts[:] # Copy the list
-                parts = [] # Make the list empty
-                for part in temp_parts: # Go through the list and add things that are valid
+                temp_parts = parts[:]  # Copy the list
+                parts = []  # Make the list empty
+                for part in temp_parts:  # Go through the list and add things that are valid
                     if part.strip() != "":
                         parts.append(part)
 
                 # Make sure there is a valid number of parts
-                if len(parts) < 3:
-                    raise SyntaxError("HeaderParser: error parsing line `" + str(line) + "`")
+                if len(parts) < 2:
+                    raise SyntaxError("HeaderParser: " + os.path.basename(file.name) + ":" + str(i + 1)
+                                      + " not enough arguments for #define")
+
+                # Just a `#define name` line
+                if len(parts) == 2:
+                    self.contents[parts[1]] = None
 
                 # Figure out the type of the data
                 name = parts[1]
@@ -129,11 +137,14 @@ class HeaderParser:
                     # value is a character
                     self.contents[name] = str(value[1:-1])
                 else:
-                    raise SyntaxWarning("HeaderParser: can not detect type of \'" + value + "\'")
+                    print("HeaderParser: " + os.path.basename(file.name) + ":" + str(i + 1)
+                          + " type detection failed (added as str)", file=sys.stderr)
+                    self.contents[name] = str(value)
                 continue
 
             # See if the line starts with an #ifdef
             if line.lstrip().startswith("#ifdef"):
+                depth += 1
 
                 parts = line.lstrip().split(" ")
                 # Get rid of empty parts (ie more than one space between things)
@@ -144,16 +155,40 @@ class HeaderParser:
                         parts.append(part)
 
                 if len(parts) != 2:
-                    raise SyntaxError("HeaderParser: error parsing line `" + str(line) + "`")
+                    raise SyntaxError("HeaderParser: " + os.path.basename(file.name) + ":" + str(i + 1)
+                                      + " not enough arguments for #ifdfe")
 
+                # See if the name has been read in already
                 if str(parts[1]) in self.contents:
                     process_ln.append(True)
                 else:
                     process_ln.append(False)
                 continue
 
+            # See if the line starts with an #ifndef
+            if line.lstrip().startswith("#ifndef"):
+                depth += 1
 
+                parts = line.lstrip().split(" ")
+                # Get rid of empty parts (ie more than one space between things)
+                temp_parts = parts[:]  # Copy the list
+                parts = []  # Make the list empty
+                for part in temp_parts:  # Go through the list and add things that are valid
+                    if part.strip() != "":
+                        parts.append(part)
+
+                if len(parts) != 2:
+                    raise SyntaxError("HeaderParser: " + os.path.basename(file.name) + ":" + str(i + 1)
+                                      + " not enough arguments for #ifdef")
+
+                # See if this name doesn't exist
+                if str(parts[1]) not in self.contents:
+                    process_ln.append(True)
+                else:
+                    process_ln.append(False)
+                continue
+
+        # Make sure the depth is right
         if depth != -1:
-            raise SyntaxError("HeaderParser: reached EOF and depth is non-zero")
-
-        pass
+            raise SyntaxError("HeaderParser: " + os.path.basename(file.name) +
+                              " reached end-of-file and depth is non-zero")
