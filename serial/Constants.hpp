@@ -3,6 +3,8 @@
  *
  * A bunch of constants used for serial transmission between the FMS and the scoring Arduino
  */
+#ifndef _serial_constants_hpp
+#define _serial_constants_hpp
 
 #define BAUD_RATE 250000 // Baud Rate of the connection
 
@@ -20,3 +22,5 @@
 #define TEST_RESPONSE "t0:s" // test successful
 
 #define MOVEMENT_DATA "md:%b:%b" // movement data of the two sticks (%b is an unsigned byte)
+
+#endif
