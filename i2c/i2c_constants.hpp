@@ -1,5 +1,5 @@
 /**
- * i2c/Constants.hpp
+ * i2c/i2c_constants.hpp
  *
  * Constants for i2c (I squared C) transmission between the controller and the Arduino Scoring Controller (ASC)
  *
