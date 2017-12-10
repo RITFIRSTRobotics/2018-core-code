@@ -16,12 +16,12 @@
 #define ADDR2 BASE_ADDR + 3
 
 // #defines for transmission data
-#define I2CDATA_DELIMITER ':'
-#define I2CDATA_BUFFER_LEN 80
-#define dlm I2CDATA_DELIMITER
+#define I2CDATA_DELIMITER ":"
+#define I2CDATA_BUFFER_LEN 60 // len of format string should be ~26
 // formatting string, should evaluate to "d:%03d:...:%01d:..."
-#define I2CDATA_FORMAT_STRING "d" + dlm + "%03d" + dlm + "%03d" + dlm + "%03d" + dlm \
-	+ "%03d" + dlm + "%01d" + dlm + "%01d" + dlm + "%01d" + dlm + "%01d" + dlm
-#undef dlm
+#define I2CDATA_FORMAT_STRING "d" I2CDATA_DELIMITER "%03d" I2CDATA_DELIMITER "%03d" \
+    I2CDATA_DELIMITER "%03d" I2CDATA_DELIMITER "%03d" I2CDATA_DELIMITER "%01d" \
+    I2CDATA_DELIMITER "%01d" I2CDATA_DELIMITER "%01d" I2CDATA_DELIMITER "%01d" \
+    I2CDATA_DELIMITER
 
 #endif
