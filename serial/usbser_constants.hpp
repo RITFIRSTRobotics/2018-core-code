@@ -6,7 +6,7 @@
 #ifndef _serial_constants_hpp
 #define _serial_constants_hpp
 
-#define BAUD_RATE 250000 // Baud Rate of the connection
+#define BAUD_RATE 115200 // Baud Rate of the connection
 
 #define NEWLINE '\n' // newline character and end-of-line character
 
