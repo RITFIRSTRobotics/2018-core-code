@@ -15,9 +15,13 @@
  *
  * These codes are designed to be as short as possible in the name of speed
  */
-#define INIT_MESSAGE "i0:%c" // initialization string (replace %c with color (r or b))
+#define BLINK_MESSAGE "b0:g"
 
-#define CALIBRATE_MESSAGE "cl:%1u" // calibrate goal %b
+#define INIT_MESSAGE "i0:%c" // initialization string (replace %c with color (r or b))
+#define INIT_RESPONSE "i1:good" // tell the FMS that the ASC has been initialzed
+
+#define CALIBRATE_MESSAGE "c0:%1u" // calibrate goal %b
+#define CALIBRATE_RESPONSE "c1:good" // tell the FMS that the goal has been calibrated
 
 #define CONTROLLER_DATA "md:%u:%u:%u:%u:%u" // movement data of the two sticks (%u is an unsigned byte) 
                                             //and a number representative of all the buttons being pressed
