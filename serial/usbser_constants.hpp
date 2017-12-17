@@ -17,11 +17,11 @@
  */
 #define INIT_MESSAGE "i0:%c" // initialization string (replace %c with color (r or b))
 
-#define CALIBRATE_MESSAGE "cl:%b" // calibrate goal %b
+#define CALIBRATE_MESSAGE "cl:%1u" // calibrate goal %b
 
-#define CONTROLLER_DATA "md:%b:%b:%b" // movement data of the two sticks (%b is an unsigned byte) 
-                                      //and a number representative of all the buttons being pressed
+#define CONTROLLER_DATA "md:%u:%u:%u:%u:%u" // movement data of the two sticks (%u is an unsigned byte) 
+                                            //and a number representative of all the buttons being pressed
 
-#define SCORE_DATA "sd:%b" // data sent when a goal has been made (send just the goal number, FMS is responsbile for the point value)
+#define SCORE_DATA "sd:%d" // data sent when a goal has been made (send just the goal number, FMS is responsbile for the point value)
 
 #endif
