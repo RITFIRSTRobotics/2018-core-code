@@ -1,7 +1,7 @@
 /**
- * serial/usbser_Constants.hpp
+ * serial/usbser_constants.hpp
  *
- * A bunch of constants used for serial transmission between the FMS and the scoring Arduino
+ * A bunch of constants used for serial transmission between the FMS and the ASC
  */
 #ifndef _serial_constants_hpp
 #define _serial_constants_hpp
@@ -15,12 +15,13 @@
  *
  * These codes are designed to be as short as possible in the name of speed
  */
+#define INIT_MESSAGE "i0:%c" // initialization string (replace %c with color (r or b))
 
-#define INIT_STRING "i0:%c" // initialization string (replace %c with color (r or b))
+#define CALIBRATE_MESSAGE "cl:%b" // calibrate goal %b
 
-#define TEST_MESSAGE "t0:t" // test if anyone is home
-#define TEST_RESPONSE "t0:s" // test successful
+#define CONTROLLER_DATA "md:%b:%b:%b" // movement data of the two sticks (%b is an unsigned byte) 
+                                      //and a number representative of all the buttons being pressed
 
-#define MOVEMENT_DATA "md:%b:%b" // movement data of the two sticks (%b is an unsigned byte)
+#define SCORE_DATA "sd:%b" // data sent when a goal has been made (send just the goal number, FMS is responsbile for the point value)
 
 #endif
