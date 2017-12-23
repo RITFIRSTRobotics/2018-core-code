@@ -17,9 +17,6 @@ class Packet(object):
         RESPONSE = 1
         STATUS = 2
 
-
-        __slots__ = [REQUEST, RESPONSE, STATUS]
-
     __slots__ = ["type", "data"]
 
     def __init__(self, type, data):
