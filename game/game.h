@@ -15,8 +15,10 @@
 #define GOAL3_SCORE 0
 
 // Define an alliance color enum
+#ifndef __py_parser // the HeaderParser doesn't need to parse this
 typedef enum AllianceColor_t {
     RED, BLUE
 } AllianceColor;
+#endif
 
 #endif

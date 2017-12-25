@@ -22,6 +22,7 @@ class HeaderParser:
 
         # Initialize the contents dict
         self.contents = dict()
+        self.contents["__py_parser"] = 0  # define __py_parser so that stuff can be #ifndef'd out
 
         # Open the file
         file = open(path, 'r')
