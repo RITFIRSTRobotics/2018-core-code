@@ -11,3 +11,5 @@ constants.GOAL0_VALUE = hp.contents['GOAL0_SCORE']
 constants.GOAL1_VALUE = hp.contents['GOAL1_SCORE']
 constants.GOAL2_VALUE = hp.contents['GOAL2_SCORE']
 constants.GOAL3_VALUE = hp.contents['GOAL3_SCORE']
+
+constants.GOAL_VALUES = (constants.GOAL0_VALUE, constants.GOAL1_VALUE, constants.GOAL2_VALUE, constants.GOAL3_VALUE)
