@@ -7,7 +7,6 @@ from enum import Enum
 
 from core.network.packetdata.PacketData import PacketData
 
-
-class RequestData(PacketData, Enum):
+class RequestData(Enum):
     STATUS = 0, 'status'  # FMS can ask the robot for it's status (enabled, disabled, etc)
     # todo add more states

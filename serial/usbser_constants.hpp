@@ -3,8 +3,8 @@
  *
  * A bunch of constants used for serial transmission between the FMS and the ASC
  */
-#ifndef _serial_constants_hpp
-#define _serial_constants_hpp
+//#ifndef _serial_constants_hpp
+#define _serial_constants_hpp 0
 
 #define BAUD_RATE 115200 // Baud Rate of the connection
 
@@ -29,4 +29,4 @@
 
 #define SCORE_DATA "sd:%d" // data sent when a goal has been made (send just the goal number, FMS is responsible for the point value)
 
-#endif
+//#endif
