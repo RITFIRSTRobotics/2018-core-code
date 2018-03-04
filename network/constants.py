@@ -4,8 +4,8 @@ Constants for networking
 :author: Connor Henley @thatging3rkid
 """
 
-PORT = int(463)
-LOG_PORT = int(464) # not currently used
+PORT = int(1463)
+LOG_PORT = int(1464) # not currently used
 
 FMS_IP = "10.0.1.2"
 
@@ -22,3 +22,5 @@ ROBOT4_IP = "10.0.1.14"
 ROBOT5_IP = "10.0.1.15"
 
 ROBOT_IPS = (ROBOT0_IP, ROBOT1_IP, ROBOT2_IP, ROBOT3_IP, ROBOT4_IP, ROBOT5_IP)
+
+TIMEOUT_TIME = .03

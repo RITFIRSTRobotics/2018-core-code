@@ -9,7 +9,7 @@ from core.network.packetdata.PacketData import PacketData
 
 class MovementData(PacketData):
 
-    __slots__ = ["stick_x", "stick_y", "scaled"]
+    #__slots__ = ["stick_x", "stick_y", "scaled"]
 
     def __init__(self, stickx, sticky):
         PacketData.__init__(self)
