@@ -29,4 +29,9 @@
 
 #define SCORE_DATA "sd:%d" // data sent when a goal has been made (send just the goal number, FMS is responsible for the point value)
 
+#define LED_STRIP_DATA "ls:%u:%u:%u" // data sent to the ASC to configure the LED strips on the field (as unsigned bytes)
+
+#define BALL_RETURN_CONTROL "bd:%u" // up in the air right now, but this would set the ball return fan speeds
+
 //#endif
+
