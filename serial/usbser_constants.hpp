@@ -31,7 +31,7 @@
 
 #define LED_STRIP_DATA "ls:%u:%u:%u" // data sent to the ASC to configure the LED strips on the field (as unsigned bytes)
 
-#define BALL_RETURN_CONTROL "bd:%u" // up in the air right now, but this would set the ball return fan speeds
+#define BALL_RETURN_CONTROL "bd:%u:%u" // up in the air right now, but this would set the ball return fan speeds
 
 //#endif
 
