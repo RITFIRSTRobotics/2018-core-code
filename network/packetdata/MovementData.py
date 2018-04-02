@@ -3,22 +3,25 @@ Movement data sent from the FMS to the robot
 
 :author: Connor Henley, @thatging3rkid
 """
-from core.network.constants import CONTROLLER_DEADZONE
 from core.network.packetdata.PacketData import PacketData
 
 
 class MovementData(PacketData):
 
-    #__slots__ = ["stick_x", "stick_y", "scaled"]
-
-    def __init__(self, stickx, sticky):
+    def __init__(self, _rd):
         PacketData.__init__(self)
-        self.stick_x = stickx
-        self.stick_y = sticky
+        self.sticks = _rd.sticks
+        self.buttons = _rd.buttons
         self.scaled = False
 
     def scale(self):
         if not self.scaled:
-            self.stick_x -= 128  # bring the number into the signed realm
-            self.stick_y -= 128  # bring the number into the signed realm
+            for i in range(self.sticks):
+                self.sticks[i] -= 128  # bring the number into the signed realm
             self.scaled = True
+
+    def get_stick0(self):
+        return self.sticks[0], self.sticks[1]
+
+    def get_stick1(self):
+        return self.sticks[2], self.sticks[3]
