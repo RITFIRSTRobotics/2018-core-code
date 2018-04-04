@@ -14,6 +14,7 @@ The repository will then have the version of core that the submodule points to (
 If you want to update the version of core to the current revision, run:
 ```
 cd core
+git checkout master
 git pull origin master
 cd ..
 git add core
