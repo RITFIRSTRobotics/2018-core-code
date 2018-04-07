@@ -16,7 +16,7 @@ class MovementData(PacketData):
 
     def scale(self):
         if not self.scaled:
-            for i in range(self.sticks):
+            for i in range(len(self.sticks)):
                 self.sticks[i] -= 128  # bring the number into the signed realm
             self.scaled = True
 
