@@ -3,7 +3,7 @@
  *
  * A bunch of constants used for serial transmission between the FMS and the ASC
  */
-//#ifndef _serial_constants_hpp
+#ifndef _serial_constants_hpp
 #define _serial_constants_hpp 0
 
 #define BAUD_RATE 115200 // Baud Rate of the connection
@@ -35,5 +35,5 @@
 #define LED_STRIP_WAVE  "lc:%c:%u:%u:%u" // make a wave with the LEDs
 #define LED_STRIP_NUM   "ln:%c:%u:%u:%u:%u" // set a certain number of LEDs a color
 
-//#endif
+#endif
 
