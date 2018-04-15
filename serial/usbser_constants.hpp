@@ -34,6 +34,7 @@
 #define LED_STRIP_SOLID "ls:%c:%u:%u:%u" // set the LEDs a solid color
 #define LED_STRIP_WAVE  "lc:%c:%u:%u:%u" // make a wave with the LEDs
 #define LED_STRIP_NUM   "ln:%c:%u:%u:%u:%u" // set a certain number of LEDs a color
+#define LED_STRIP_ONE   "lo:%u:%u:%u:%u" // set a single LED on the strip to a color
 
 #endif
 
