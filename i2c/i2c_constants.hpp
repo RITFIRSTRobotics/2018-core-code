@@ -21,7 +21,7 @@
 #define I2CDATA_DELIMITER ":"
 #define I2CDATA_BUFFER_LEN 32
 // formatting string, sprintf into a buffer using it
-#define I2CDATA_FORMAT_STRING CONTROLLER_DATA
+#define I2CDATA_FORMAT_STRING CONTROLLER_DATA ":::::"
 
 #endif
 
