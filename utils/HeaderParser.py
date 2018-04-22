@@ -95,7 +95,7 @@ class HeaderParser:
 
             # Skip the line if it should not be processed (ie #ifdef is false)
             if depth != -1:
-                if not process_ln[depth] is None or process_ln[depth] is True:
+                if not(process_ln[depth] == None or process_ln[depth] == True):
                     continue
 
             # See if the line starts with #define
